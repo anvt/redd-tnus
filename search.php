@@ -7,43 +7,30 @@ require_once('admin/function.php');
 $id = (isset($_GET['id'])) ? $_GET['id'] : '';
 $catid = (isset($_GET['catid'])) ? $_GET['catid'] : '';
 $page = (isset($_GET['page'])) ? $_GET['page'] : 1;
-$tag = (isset($_GET['tag'])) ? $_GET['tag'] : '';
 $page = (!empty($page)) ? $page : 1;
-$catid = (!empty($catid)) ? $catid : getCategoryByPostId($id);
-$catid = (!empty($catid)) ? $catid : 15; 
+/* $catid = (!empty($catid)) ? $catid : getCategoryByPostId($id);
+$catid = (!empty($catid)) ? $catid : 18;  */
+$keyword = (isset($_GET['keyword'])) ? $_GET['keyword'] : '';
 
 	$tempExport_part_header = "";
 	$tempExport_part_content = "";
 	$tempExport_part_footer = "";	
 	$tempExport_part_header = export("part_header");
-	$tempExport_part_content = export("part_download");
+	$tempExport_part_content = export("part_search");
 	$tempExport_part_footer = export("part_footer");
 	$tempExport = $tempExport_part_header;
 	$tempExport .=$tempExport_part_content;
 	$tempExport .=$tempExport_part_footer;
-
-	/* if(!empty($id))
-	{
-		$NEWS_BLOCK = getIntroDetail($id);
-		$NEWS_BLOCK_OTHER = getIntroDetail_Other($id, 4);
-	}
-	else
-	{
-		$NEWS_BLOCK = getIntro($page,$catid);
-		$PAGE_NAVIGATOR = getIntroPaging($page,$catid);
-	} */	
-	if(!empty($tag))
-	{
-		$NEWS_BLOCK = getDownloadByTag($page,$tag);
-		$PAGE_NAVIGATOR = getDownloadPagingByTag($page,$tag);
-	}
-	else
-	{
-		$NEWS_BLOCK = getDownload($page,$catid);
-		$PAGE_NAVIGATOR = getDownloadPaging($page,$catid);
-	}
-	/* $NEWS_BLOCK = getDownload($page,$catid);
-	$PAGE_NAVIGATOR = getDownloadPaging($page,$catid); */
+if(strlen($keyword)<3)
+{
+	$NEWS_BLOCK = 'Từ khóa cần tìm kiếm phải có từ<strong><span> 3 </span></strong>ký tự trở lên!';
+	$PAGE_NAVIGATOR = '';
+}
+else
+{
+	$NEWS_BLOCK = getSearch($page, $keyword);
+	$PAGE_NAVIGATOR = getSearchPaging($page, $keyword);
+}
 	
 	/**
 		NEWS BLOCK SUB
@@ -59,14 +46,14 @@ $catid = (!empty($catid)) ? $catid : 15;
 	/**
 		RENDER DATA
 	*/
-	$SELECT_BLOCK = getListProject($catid);
+	
 	$BREAD_CRUMB = breadCrum($catid);
 	$CURRENTMONTH = date("m", time());
 	$CURRENTYEAR = date("Y", time());
 	
 	$tempExport = str_replace("{SELECT_BLOCK}", $SELECT_BLOCK, $tempExport);
 	$tempExport = str_replace("{BREAD_CRUMB}", $BREAD_CRUMB, $tempExport);
-	$tempExport = str_replace("{DOWNLOAD_BLOCK}", $NEWS_BLOCK, $tempExport);
+	$tempExport = str_replace("{NEWS_BLOCK}", $NEWS_BLOCK, $tempExport);
 	$tempExport = str_replace("{PAGE_NAVIGATOR}", $PAGE_NAVIGATOR, $tempExport);
 	$tempExport = str_replace("{NEWS_BLOCK_OTHER}", $NEWS_BLOCK_OTHER, $tempExport);
 	$tempExport = str_replace("{NEWS_BLOCK_SUB}", $NEWS_BLOCK_SUB, $tempExport);
